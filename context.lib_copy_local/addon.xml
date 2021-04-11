@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<addon id="context.lib_copy_local" name="Lib Copy Local" version="0.0.2" provider-name="Martin Wichmann">
+    <requires>
+        <import addon="xbmc.python" version="3.0.0"/>
+        <import addon="script.module.requests" version="2.21.0"/>
+    </requires>
+    <extension point="kodi.context.item" library="main.py">
+    <item>
+        <label>Kopiere nach Lokal</label>
+        <visible>String.IsEqual(Container.PluginName, plugin.lib_remote_browse)</visible>
+    </item>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="en_GB"></summary>
+        <description lang="en_GB"></description>
+        <language></language>
+        <platform>linux</platform>
+        <license>BSD-3-Clause</license>
+        <forum></forum>
+        <website></website>
+        <email></email>
+        <source></source>
+        <news></news>
+        <disclaimer></disclaimer>
+        <assets>
+            <icon>resources/icon.png</icon>
+            <fanart>resources/fanart.jpg</fanart>
+        </assets>
+    </extension>
+</addon>

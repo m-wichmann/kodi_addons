@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <setting id="server" type="ipaddress" label="Kodi Server" default=""/>
+    <setting id="port" type="number" label="Kodi Server Port" default="8080"/>
+    <setting id="username" type="text" label="Kodi User" default=""/>
+    <setting id="password" type="text" label="Kodi Password" option="hidden" default=""/>
+    <setting id="dest_base" type="folder" label="Dest. Base" default="" option="writeable"/>
+</settings>
