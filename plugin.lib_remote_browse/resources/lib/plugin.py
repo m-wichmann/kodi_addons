@@ -289,7 +289,6 @@ class StoppableWSGIRefServer(bottle.ServerAdapter):
         self.server.serve_forever()
 
     def stop(self):
-        print('############## server stop')
         self.server.shutdown()
 
 
