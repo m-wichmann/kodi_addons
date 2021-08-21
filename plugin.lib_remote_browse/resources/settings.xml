@@ -5,4 +5,5 @@
     <setting id="username" type="text" label="Kodi User" default=""/>
     <setting id="password" type="text" label="Kodi Password" option="hidden" default=""/>
     <setting id="smb_base" type="text" label="Samba Base" default=""/>
+    <setting id="vote_port" type="number" label="Lokaler Port für Vote" default="8081"/>
 </settings>
