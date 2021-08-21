@@ -305,8 +305,11 @@ def filter_showable_movies(movies, vote_data, username):
     movieids = filter_by_downvote(movieids, vote_data)
     try:
         for movie in vote_data[username]:
-            movieids.remove(movie)
-    except KeyError:
+            try:
+                movieids.remove(movie)
+            except KeyError as e:
+                pass
+    except KeyError as e:
         pass
 
     # Filter movie list by IDs from previous step
@@ -322,7 +325,7 @@ def service_get_movie():
     vote_data = load_vote_data()
 
     movie = None
-    if random.random() < 0.75:
+    if random.random() < 0.50:
         showable_movies = filter_showable_movies(movies, vote_data, username)
         if len(showable_movies) > 0:
             movie = random.choice(showable_movies)
