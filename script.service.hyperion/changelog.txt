@@ -1,0 +1,15 @@
+2.0.2
+- Changes for Python 3
+- Added current version of protobuf library instead of relying on Kodi module
+2.0.0
+- Rewritten main part, because it seems way easier than fixing annoying bugs
+1.0.3
+- remove protobuf library
+1.0.2
+- Translate to DE and extend description
+- New icon and fanart
+1.0.1
+- Added option to set framerate and capture size
+- Kodi V17 fix thanks to @bimsarck and @iLLiac4
+1.0.0
+- initial addon release
