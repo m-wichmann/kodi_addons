@@ -119,6 +119,7 @@ def get_movies_filtered(filter):
     props += ['tagline', 'plot', 'plotoutline']
     props += ['originaltitle', 'sorttitle']
     props += ['fanart', 'thumbnail', 'art']
+    props += ['imdbnumber']
     r = rpc('VideoLibrary.GetMovies', params={'properties': props, 'filter': filter})
     return r
 
@@ -132,37 +133,72 @@ def conv_image_path_local(image_path, host_name):
 
 
 def gen_list_item(movie, custom_rating=None):
-    info = {'mediatype': 'movie'}
-    info['title'] = movie['title']
-    info['duration'] = movie['runtime']
-    info['genre'] = movie['genre']
-    info['year'] = movie['year']
-    if custom_rating != None:
-        info['rating'] = custom_rating
-    else:
-        info['rating'] = movie['rating']
-    info['country'] = movie['country']
-    info['director'] = movie['director']
-    info['writer'] = movie['writer']
-    info['tagline'] = movie['tagline']
-    info['plot'] = movie['plot']
-    info['plotoutline'] = movie['plotoutline']
-    info['originaltitle'] = movie['originaltitle']
-    info['sorttitle'] = movie['sorttitle']
+    l = xbmcgui.ListItem()
+
+    info_tag = l.getVideoInfoTag()
+    info_tag.setMediaType('movie')
+    info_tag.setTitle(movie['title'])
+    info_tag.setDuration(movie['runtime'])
+    info_tag.setGenres(movie['genre'])
+    info_tag.setYear(movie['year'])
+    info_tag.setRating(custom_rating if custom_rating else movie['rating'])
+    info_tag.setCountries(movie['country'])
+    info_tag.setDirectors(movie['director'])
+    info_tag.setWriters(movie['writer'])
+    info_tag.setTagLine(movie['tagline'])
+    info_tag.setPlot(movie['plot'])
+    info_tag.setPlotOutline(movie['plotoutline'])
+    info_tag.setOriginalTitle(movie['originaltitle'])
+    info_tag.setSortTitle(movie['sorttitle'])
 
     # Use dateadded to sort by 'random'
     random_date = datetime.datetime.today() + datetime.timedelta(random.random() * 1000)
-    info['dateadded'] = random_date.strftime('%Y-%m-%d %H-%M-%S')
+    info_tag.setDateAdded(random_date.strftime('%Y-%m-%d %H-%M-%S'))
 
-    l = xbmcgui.ListItem()
     l.setProperty('IsPlayable', 'true')
-    l.setInfo('video', info)
+
     thumb_path = conv_image_path(movie['thumbnail'])
     fanart_path = conv_image_path(movie['fanart'])
     poster_path = conv_image_path(movie['art']['poster'])
     l.setArt({'thumb': thumb_path, 'fanart': fanart_path, 'poster': poster_path})
     l.setProperty('ServerPath', movie['file'])
     return l
+
+
+def convert_ger_lut(movie_data):
+    path = ADDON.getAddonInfo('path')
+    path = xbmcvfs.translatePath(path)
+    path = os.path.join(path, 'resources', 'ger_lut.json')
+
+    # Load LUT data
+    try:
+        with open(path) as fd:
+            ger_lut_data = json.load(fd)
+    except FileNotFoundError:
+        return movie_data
+
+    # Convert data to easier access movie
+    ger_lut_data = {e['imdbnumber']: e for e in ger_lut_data}
+
+    # Replace data
+    for movie in movie_data:
+        try:
+            ger_movie = ger_lut_data[movie['imdbnumber']]
+        except KeyError:
+            continue
+
+        orig_title = None
+        if ger_movie['german_title']:
+            orig_title = movie['title']
+            movie['title'] = ger_movie['german_title']
+
+        if ger_movie['german_descr']:
+            movie['plot'] = ger_movie['german_descr']
+
+        if orig_title:
+            movie['plot'] = 'Original-Titel: "' + orig_title + '"\n' + movie['plot']
+
+    return movie_data
 
 
 def load_ger_movies():
@@ -179,6 +215,7 @@ def load_ger_movies():
         ]}
         response = get_movies_filtered(filter)
         movie_data = response['movies']
+        movie_data = convert_ger_lut(movie_data)
         save_movie_data_cache(movie_data)
     return movie_data
 
@@ -329,7 +366,7 @@ def service_get_movie():
         showable_movies = filter_showable_movies(movies, vote_data, username)
         if len(showable_movies) > 0:
             movie = random.choice(showable_movies)
-    
+
     # If new movie should be displayed, or there are no more showable movies, choose one at random
     if movie is None:
         movie = random.choice(movies)
